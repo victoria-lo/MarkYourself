@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="100">
+
+    <LinearLayout
+        android:layout_width="210dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="33.3"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/assignmentView"
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:gravity="center"
+            android:text="assignment_name"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/dateView"
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:gravity="center"
+            android:text="date"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/weightView"
+        android:layout_width="98dp"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:paddingBottom="26dp"
+        android:text="30"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="121dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="33.3"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/gradeView"
+            android:layout_width="98dp"
+            android:layout_height="34dp"
+            android:gravity="center"
+            android:text="60"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/targetView"
+            android:layout_width="98dp"
+            android:layout_height="26dp"
+            android:gravity="center"
+            android:text="Goal: "
+            android:textSize="14sp"
+            android:textStyle="italic" />
+    </LinearLayout>
+</LinearLayout>
