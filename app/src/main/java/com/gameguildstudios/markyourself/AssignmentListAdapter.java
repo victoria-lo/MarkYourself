@@ -37,8 +37,8 @@ public class AssignmentListAdapter extends ArrayAdapter<Assignment> {
     public View getView(int position, View convertView, ViewGroup parent) {
         //get the persons information
         String name = getItem(position).getName();
-        Integer weight = getItem(position).getWeight();
-        Integer grade = getItem(position).getGrade();
+        double weight = getItem(position).getWeight();
+        double grade = getItem(position).getGrade();
         String date = getItem(position).getDate();
         String target = getItem(position).getTarget();
 

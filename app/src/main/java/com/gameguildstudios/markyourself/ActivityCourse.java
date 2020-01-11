@@ -20,7 +20,6 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 
@@ -30,29 +29,28 @@ public class ActivityCourse extends AppCompatActivity {
     Button calcBtn;
     SwipeMenuListView mListView;
     AssignmentListAdapter mAdapter;
-    ArrayList<Assignment> assignmentList;
     EditText goalGrade;
+    Utils utils;
+    String courseName;
 
     private DatePickerDialog.OnDateSetListener mDateSetListener;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course);
-
+        utils = new Utils(getApplicationContext());
         mListView = (SwipeMenuListView) findViewById((R.id.swipeListView));
         addAssignment = (ImageButton)findViewById(R.id.addAWBtn);
         calcBtn = (Button)findViewById(R.id.calcBtn);
-
-        assignmentList = new ArrayList<>();
-        mAdapter = new AssignmentListAdapter(ActivityCourse.this,
-                R.layout.layout_assignments, assignmentList);
-
-        mListView.setAdapter(mAdapter);
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            getSupportActionBar().setTitle(bundle.getString("CourseName"));
+            courseName = bundle.getString("CourseName");
+            getSupportActionBar().setTitle(courseName);
         }
+        mAdapter = new AssignmentListAdapter(ActivityCourse.this,
+                R.layout.layout_assignments, utils.getAssignments(courseName));
+
+        mListView.setAdapter(mAdapter);
 
         //Add button functions
         onBtnClick();
@@ -104,7 +102,7 @@ public class ActivityCourse extends AppCompatActivity {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0: //Edit
-                        showInputBox(assignmentList.get(position), position);
+                        showInputBox(utils.getAssignments(courseName).get(position), position);
                         break;
                     case 1: //Delete
                         removeItem(position);
@@ -124,19 +122,19 @@ public class ActivityCourse extends AppCompatActivity {
             }
         });
         calcBtn.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){int w = 0;
+            public void onClick(View v){double w = 0;
                 //calculate expected grade
                 goalGrade = (EditText)findViewById(R.id.inputGradeGoal);
-                if(!goalGrade.getText().toString().trim().equals("") && !assignmentList.isEmpty()){
+                if(!goalGrade.getText().toString().trim().equals("") && !utils.getAssignments(courseName).isEmpty()){
                     double finalGoal = Integer.parseInt(goalGrade.getText().toString().trim());
                     double c = 0; //current grade
                     double wa = 0; //weight accounted for
 
-                    int g = 0;
+                    double g = 0;
 
-                    for(int i = 0; i< assignmentList.size();i++){  //calculate final values or wr, wa, c
-                        w = assignmentList.get(i).getWeight();
-                        g = assignmentList.get(i).getGrade();
+                    for(int i = 0; i< utils.getAssignments(courseName).size();i++){  //calculate final values or wr, wa, c
+                        w = utils.getAssignments(courseName).get(i).getWeight();
+                        g = utils.getAssignments(courseName).get(i).getGrade();
 
                         if (g > 0){
                             wa+=w;
@@ -147,13 +145,14 @@ public class ActivityCourse extends AppCompatActivity {
                                 c = c/wa;
                             }
                             double gradeNeeded = ((finalGoal-c*(wa/100))/((100-wa)/100));
-                            Assignment assignment = assignmentList.get(i);
+                            Assignment assignment = utils.getAssignments(courseName).get(i);
                             assignment.target = "Goal: "+ Math.ceil(gradeNeeded);
                             mAdapter.notifyDataSetChanged();
                             break;
                         }
                     }
                     Toast.makeText(getApplicationContext(),"Next goal calculated.", Toast.LENGTH_LONG).show();
+                    utils.save();
                 }
             }
         });
@@ -162,8 +161,8 @@ public class ActivityCourse extends AppCompatActivity {
 
     //Remove list item
     public void removeItem(int position){
-        Assignment item = assignmentList.get(position);
-        assignmentList.remove(item);
+        Assignment item = utils.getAssignments(courseName).get(position);
+        utils.getAssignments(courseName).remove(item);
         mAdapter.notifyDataSetChanged();
         Toast.makeText(getApplicationContext(),"Removed assignment.", Toast.LENGTH_SHORT).show();
     }
@@ -242,8 +241,8 @@ public class ActivityCourse extends AppCompatActivity {
                         assignment.weight = w;
                     }
                 }
-                assignmentList.set(index, assignment);
-                Collections.sort(assignmentList); //Sort assignments by date
+                utils.getAssignments(courseName).set(index, assignment);
+                Collections.sort(utils.getAssignments(courseName)); //Sort assignments by date
                 mAdapter.notifyDataSetChanged();
                 dialog.dismiss();
                 Toast.makeText(getApplicationContext(),"Assignment edited.", Toast.LENGTH_SHORT).show();
@@ -299,20 +298,21 @@ public class ActivityCourse extends AppCompatActivity {
 
                 if(!inputD.getText().toString().trim().equals("") && !inputA.getText().toString().trim().equals("") && !inputW.getText().toString().trim().equals("")){
                     String a = inputA.getText().toString().trim();
-                    Integer w = Integer.parseInt(inputW.getText().toString().trim());
+                    int w = Integer.parseInt(inputW.getText().toString().trim());
                     if(w>100 || w <=0) {
                         inputW.setText("");
                         Toast.makeText(getApplicationContext(), "Weight value is invalid.", Toast.LENGTH_SHORT).show();
                     }else {
                         String d = inputD.getText().toString().trim();
                         Assignment newA = new Assignment(a, w, 0, "Due on: " + d, "Goal: ");
-                        assignmentList.add(newA);
-                        Collections.sort(assignmentList); //Sort assignments by date
+                        utils.getAssignments(courseName).add(newA);
+                        Collections.sort(utils.getAssignments(courseName)); //Sort assignments by date
                         mAdapter.notifyDataSetChanged();
                         inputA.setText("");
                         inputW.setText("");
                         dialog.dismiss();
                         Toast.makeText(getApplicationContext(), "New assignment added.", Toast.LENGTH_SHORT).show();
+                        utils.save();
                     }
                 }else{
                     Toast.makeText(getApplicationContext(),"Missing values.", Toast.LENGTH_SHORT).show();

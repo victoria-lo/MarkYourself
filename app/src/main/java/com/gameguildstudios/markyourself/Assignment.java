@@ -1,5 +1,6 @@
 package com.gameguildstudios.markyourself;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,12 +8,12 @@ import java.util.Date;
 public class Assignment implements Comparable<Assignment> {
 
     public String name;
-    public Integer weight;
-    public Integer grade;
+    public double weight;
+    public double grade;
     public String date;
     public String target;
 
-    public Assignment(String name, Integer weight, Integer grade, String date, String target) {
+    public Assignment(String name, double weight, double grade, String date, String target) {
         this.name = name;
         this.weight = weight;
         this.grade = grade;
@@ -24,11 +25,11 @@ public class Assignment implements Comparable<Assignment> {
         return name;
     }
 
-    public Integer getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public Integer getGrade() {
+    public Double getGrade() {
         return grade;
     }
 

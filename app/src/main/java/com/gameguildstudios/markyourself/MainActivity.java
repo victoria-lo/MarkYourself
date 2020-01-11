@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
@@ -25,23 +25,23 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 public class MainActivity extends AppCompatActivity {
 
     SwipeMenuListView listView;
-
-    ArrayList<String> courses;
     ArrayAdapter<String> mAdapter;
     ImageButton addCourse;
     EditText newCourse;
+    ArrayList<String> courses;
+    Utils utils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        utils = new Utils(getApplicationContext());
         setContentView(R.layout.activity_main);
 
         listView = (SwipeMenuListView) findViewById(R.id.swipeListView);
 
         addCourse = (ImageButton)findViewById(R.id.addBtn);
         newCourse = (EditText)findViewById(R.id.enterCourse);
-        courses = new ArrayList<>();
-
+        courses = utils.getCourseList();
         mAdapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_list_item_1, courses);
 
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0: //Edit
-                        showInputBox(courses.get(position), position);
+                        showInputBox(utils.getCourseList().get(position), position);
                         break;
                     case 1: //Delete
                         removeItem(position);
@@ -120,11 +120,13 @@ public class MainActivity extends AppCompatActivity {
     public void onBtnClick(){
         addCourse.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                String added = newCourse.getText().toString().trim();
-                if(!added.equals((""))){
-                    courses.add(added);
+                String courseName = newCourse.getText().toString().trim();
+                if(!courseName.equals((""))){
+                    courses.add(courseName);
                     mAdapter.notifyDataSetChanged();
                     newCourse.setText("");
+                    utils.addCourse(courseName);
+                    utils.save();
                 }else{
                     Toast.makeText(getApplicationContext(),"Enter a course.", Toast.LENGTH_SHORT).show();
                 }
@@ -133,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void removeItem(int position){
-        String item = courses.get(position);
-        courses.remove(item);
+        String item = utils.getCourseList().get(position);
+        utils.getCourseList().remove(item);
         mAdapter.notifyDataSetChanged();
         Toast.makeText(getApplicationContext(),"Removed course.", Toast.LENGTH_SHORT).show();
     }
@@ -152,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                courses.set(index,editText.getText().toString());
+                utils.getCourseList().set(index,editText.getText().toString());
                 mAdapter.notifyDataSetChanged();
                 dialog.dismiss();
             }
